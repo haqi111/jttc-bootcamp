@@ -9,6 +9,16 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 $ctrl = new DestinasiController();
 
+if ($path === '/destinasi/create' && $method === 'GET') {
+  $ctrl->create();
+  exit;
+}
+
+if ($path === '/destinasi' && $method === 'POST') {
+  $ctrl->store($_POST);
+  exit;
+}
+
 if ($path === '/' || $path === '/destinasi') {
   $ctrl->index();
   exit;

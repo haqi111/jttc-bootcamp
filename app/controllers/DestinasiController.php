@@ -30,5 +30,45 @@ class DestinasiController {
     ];
     render('destinasi/show', ['dest' => $dest, 'atraksi' => $rows, 'title' => $dest['nama_destinasi']]);
   }
+
+  public function create() {
+    render('destinasi/create', ['title' => 'Tambah Destinasi']);
+  }
+
+  public function store(array $data) {
+    $nama   = trim($data['nama_destinasi'] ?? '');
+    $kota   = trim($data['kota'] ?? '');
+    $alamat = trim($data['alamat'] ?? '');
+
+    $errors = [];
+    if ($nama === '') { $errors['nama_destinasi'] = 'Nama destinasi wajib diisi'; }
+    if ($kota === '') { $errors['kota'] = 'Kota wajib diisi'; }
+
+    if ($errors) {
+      render('destinasi/create', [
+        'title'   => 'Tambah Destinasi',
+        'errors'  => $errors,
+        'old'     => ['nama_destinasi' => $nama, 'kota' => $kota, 'alamat' => $alamat],
+      ]);
+      return;
+    }
+
+    $stmt = db()->prepare("
+      INSERT INTO destinasi (nama_destinasi, kota, alamat)
+      VALUES (:nama, :kota, :alamat)
+    ");
+    $stmt->execute([
+      ':nama'   => $nama,
+      ':kota'   => $kota,
+      ':alamat' => $alamat === '' ? null : $alamat,
+    ]);
+
+    $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+    if ($basePath === '/' || $basePath === '.') { $basePath = ''; }
+    $redirectTo = $basePath === '' ? '/destinasi' : $basePath;
+
+    header('Location: ' . $redirectTo);
+    exit;
+  }
   
 }

@@ -23,6 +23,8 @@
       <nav>
         <a href="<?= $basePath === '' ? '/destinasi' : $basePath ?>">Destinasi</a>
       </nav>
+
+        <a href="<?= $basePath === '' ? '/destinasi/create' : $basePath . '/create' ?>">Tambah Destinasi</a>
       <hr>
     </header>
 
