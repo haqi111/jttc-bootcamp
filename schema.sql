@@ -7,7 +7,8 @@ CREATE TABLE destinasi (
   id_destinasi INT PRIMARY KEY AUTO_INCREMENT,
   nama_destinasi VARCHAR(100) NOT NULL,
   kota VARCHAR(100) NOT NULL,
-  alamat VARCHAR(200)
+  alamat VARCHAR(200),
+  gambar VARCHAR(255)
 );
 
 CREATE TABLE atraksi (
