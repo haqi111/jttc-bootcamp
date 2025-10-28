@@ -2,14 +2,47 @@
 require_once __DIR__ . '/../lib/db.php';
 require_once __DIR__ . '/../lib/view.php';
 
-class DestinasiController {
-  public function index() {
-    $sql = "SELECT id_destinasi, nama_destinasi, kota FROM destinasi ORDER BY nama_destinasi";
-    $rows = db()->query($sql)->fetchAll();
+class DestinasiController
+{
+  public function index()
+  {
+
+    // Get Filter Data from Query Params (if any)
+    $filter = [];
+    if (isset($_GET['city'])) {
+      $filter['city'] = $_GET['city'];
+    }
+
+    if (isset($_GET['search'])) {
+      $filter['search'] = $_GET['search'];
+    }
+
+    // query 
+    $sql = "SELECT id_destinasi, nama_destinasi, kota FROM destinasi";
+    $conditions = [];
+    $params = [];
+    if (isset($filter['city']) && $filter['city'] !== '') {
+      $conditions[] = "kota = :city";
+      $params[':city'] = $filter['city'];
+    }
+    if (isset($filter['search']) && $filter['search'] !== '') {
+      $conditions[] = "nama_destinasi LIKE :search";
+      $params[':search'] = '%' . $filter['search'] . '%';
+    }
+    if ($conditions) {
+      $sql .= " WHERE " . implode(" AND ", $conditions);
+    }
+
+    $sql .= " ORDER BY nama_destinasi";
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+
     render('destinasi/index', ['items' => $rows, 'title' => 'Daftar Destinasi']);
   }
 
-  public function show($id) {
+  public function show($id)
+  {
     $stmt = db()->prepare("
       SELECT d.id_destinasi, d.nama_destinasi, d.kota, d.alamat,
              a.nama_atraksi
@@ -20,7 +53,11 @@ class DestinasiController {
     ");
     $stmt->execute([(int)$id]);
     $rows = $stmt->fetchAll();
-    if (!$rows) { http_response_code(404); echo "Destinasi tidak ditemukan"; return; }
+    if (!$rows) {
+      http_response_code(404);
+      echo "Destinasi tidak ditemukan";
+      return;
+    }
 
     $dest = [
       'id_destinasi'   => $rows[0]['id_destinasi'],
@@ -31,18 +68,24 @@ class DestinasiController {
     render('destinasi/show', ['dest' => $dest, 'atraksi' => $rows, 'title' => $dest['nama_destinasi']]);
   }
 
-  public function create() {
+  public function create()
+  {
     render('destinasi/create', ['title' => 'Tambah Destinasi']);
   }
 
-  public function store(array $data) {
+  public function store(array $data)
+  {
     $nama   = trim($data['nama_destinasi'] ?? '');
     $kota   = trim($data['kota'] ?? '');
     $alamat = trim($data['alamat'] ?? '');
 
     $errors = [];
-    if ($nama === '') { $errors['nama_destinasi'] = 'Nama destinasi wajib diisi'; }
-    if ($kota === '') { $errors['kota'] = 'Kota wajib diisi'; }
+    if ($nama === '') {
+      $errors['nama_destinasi'] = 'Nama destinasi wajib diisi';
+    }
+    if ($kota === '') {
+      $errors['kota'] = 'Kota wajib diisi';
+    }
 
     if ($errors) {
       render('destinasi/create', [
@@ -64,11 +107,12 @@ class DestinasiController {
     ]);
 
     $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
-    if ($basePath === '/' || $basePath === '.') { $basePath = ''; }
+    if ($basePath === '/' || $basePath === '.') {
+      $basePath = '';
+    }
     $redirectTo = $basePath === '' ? '/destinasi' : $basePath;
 
     header('Location: ' . $redirectTo);
     exit;
   }
-  
 }

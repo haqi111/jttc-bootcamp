@@ -1,13 +1,22 @@
 <?php
 require_once __DIR__ . '/../app/controllers/DestinasiController.php';
+require_once __DIR__ . '/../app/controllers/HomeController.php';
 
 $path   = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 $path   = rtrim($path, '/');
-if ($path === '') { $path = '/'; }
+if ($path === '') {
+  $path = '/';
+}
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 $ctrl = new DestinasiController();
+$homeCtrl = new HomeController();
+
+if ($path === '/home' || $path === '/' && $method === 'GET') {
+  $homeCtrl->index();
+  exit;
+}
 
 if ($path === '/destinasi/create' && $method === 'GET') {
   $ctrl->create();
@@ -19,7 +28,7 @@ if ($path === '/destinasi' && $method === 'POST') {
   exit;
 }
 
-if ($path === '/' || $path === '/destinasi') {
+if ($path === '/destinasi') {
   $ctrl->index();
   exit;
 }
