@@ -27,6 +27,16 @@ CREATE TABLE kuliner (
     FOREIGN KEY (id_destinasi) REFERENCES destinasi(id_destinasi)
 );
 
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL 
+);
+
+
+INSERT INTO users (username, password) VALUES
+('admin', 'admin123');
+
 INSERT INTO destinasi (nama_destinasi, kota, alamat) VALUES
 ('Candi Borobudur', 'Magelang', 'Borobudur, Magelang'),
 ('Pantai Parangtritis', 'Bantul', 'Kretek, Bantul'),
