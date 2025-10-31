@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../lib/db.php';
 require_once __DIR__ . '/../lib/view.php';
+require_once __DIR__ . '/../lib/url.php';
 
 class DestinasiController {
   public function index() {
@@ -63,11 +64,7 @@ class DestinasiController {
       ':alamat' => $alamat === '' ? null : $alamat,
     ]);
 
-    $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
-    if ($basePath === '/' || $basePath === '.') { $basePath = ''; }
-    $redirectTo = $basePath === '' ? '/destinasi' : $basePath;
-
-    header('Location: ' . $redirectTo);
+    header('Location: ' . app_url('/destinasi'));
     exit;
   }
   
